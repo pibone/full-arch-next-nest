@@ -1,0 +1,25 @@
+services:
+  nginx:
+    environment:
+      USE_LOCAL_CA: 1
+  frontend:
+    image: ${DOCKER_REPO}frontend:dev
+    build: { target: development }
+    volumes:
+      - ${FRONTEND_CONTEXT}/src:/app/src:ro
+      - ${FRONTEND_CONTEXT}/tailwind.config.ts:/app/tailwind.config.ts:ro
+  backend:
+    image: ${DOCKER_REPO}backend:dev
+    build: { target: development }
+    volumes: ["${BACKEND_CONTEXT}/src:/app/src:ro"]
+  postgres:
+    image: postgres
+    restart: always
+    ports: [5432:5432]
+    expose: ["${POSTGRES_PORT}:5432"]
+    volumes:
+      - ${VOLUMES}/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}

@@ -1,0 +1,26 @@
+services:
+  frontend:
+    image: ${DOCKER_REPO}frontend:latest
+    restart: unless-stopped
+    build: { context: "${FRONTEND_CONTEXT}" }
+    expose: [3000:3000]
+  backend:
+    image: ${DOCKER_REPO}backend:latest
+    restart: unless-stopped
+    build: { context: "${BACKEND_CONTEXT}" }
+    expose: [3000:3000]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
+  nginx:
+    image: danpeis/nginx-certbot
+    restart: unless-stopped
+    ports: [80:80, 443:443]
+    volumes:
+      - ${DEPLOY}/nginx/conf.d:/etc/nginx/user_conf.d:ro
+      - ${VOLUMES}/letsencrypt:/etc/letsencrypt:rw
+    environment:
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
