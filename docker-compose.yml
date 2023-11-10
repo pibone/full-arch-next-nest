@@ -15,6 +15,9 @@ services:
       POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_DB: ${POSTGRES_DB}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
   nginx:
     image: danpeis/nginx-certbot
     restart: unless-stopped
@@ -24,3 +27,13 @@ services:
       - ${VOLUMES}/letsencrypt:/etc/letsencrypt:rw
     environment:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    expose: ["${REDIS_PORT}:6379"]
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ${DEPLOY}/redis/conf:/usr/local/etc/redis
+      - ${VOLUMES}/redis:/data
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
